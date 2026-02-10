@@ -1,71 +1,56 @@
 import streamlit as st
 import pandas as pd
 import joblib
-import requests
 import os
+import urllib.request
 
 MODEL_URL = "https://huggingface.co/mp28/ecotype-forest-cover-classifier/resolve/main/final_pipeline.pkl"
-FEATURES_URL = "https://huggingface.co/mp28/ecotype-forest-cover-classifier/resolve/main/model_features.pkl"
-CLASS_MAP_URL = "https://huggingface.co/mp28/ecotype-forest-cover-classifier/resolve/main/class_map.pkl"
+DATA_URL = "https://huggingface.co/datasets/mp28/ecotype-forest-cover-dataset/resolve/main/final_preprocessed_data.csv"
+
+os.makedirs("models", exist_ok=True)
+
+def download(url, path):
+    if not os.path.exists(path):
+        urllib.request.urlretrieve(url, path)
 
 @st.cache_resource
-def download_and_load():
-    os.makedirs("models", exist_ok=True)
-
-    if not os.path.exists("models/final_pipeline.pkl"):
-        with open("models/final_pipeline.pkl", "wb") as f:
-            f.write(requests.get(MODEL_URL).content)
-
-    if not os.path.exists("models/model_features.pkl"):
-        with open("models/model_features.pkl", "wb") as f:
-            f.write(requests.get(FEATURES_URL).content)
-
-    if not os.path.exists("models/class_map.pkl"):
-        with open("models/class_map.pkl", "wb") as f:
-            f.write(requests.get(CLASS_MAP_URL).content)
+def load_assets():
+    download(MODEL_URL, "models/final_pipeline.pkl")
+    download(DATA_URL, "models/final_preprocessed_data.csv")
 
     pipeline = joblib.load("models/final_pipeline.pkl")
-    features = joblib.load("models/model_features.pkl")
-    class_map = joblib.load("models/class_map.pkl")
+    df = pd.read_csv("models/final_preprocessed_data.csv")
 
-    return pipeline, features, class_map
+    X = df.drop(columns=["Cover_Type"])
+    class_map = {
+        0: "Aspen",
+        1: "Cottonwood/Willow",
+        2: "Douglas-fir",
+        3: "Krummholz",
+        4: "Lodgepole Pine",
+        5: "Ponderosa Pine",
+        6: "Spruce/Fir"
+    }
 
+    return pipeline, X.columns.tolist(), class_map, X
 
-pipeline, features, class_map = download_and_load()
+pipeline, features, class_map, df_sample = load_assets()
 
 st.title("🌲 Forest Cover Type Prediction")
-
-soil_cols = [c for c in features if c.startswith("Soil_Type")]
-wild_cols = [c for c in features if c.startswith("Wilderness_Area")]
-num_cols = [c for c in features if c not in soil_cols + wild_cols]
 
 st.sidebar.header("Input Features")
 
 inputs = {}
-for col in num_cols:
-    inputs[col] = st.sidebar.slider(col, 0.0, 5000.0, 0.0)
-
-soil = st.sidebar.selectbox("Soil Type", soil_cols)
-wild = st.sidebar.selectbox("Wilderness Area", wild_cols)
+for col in features:
+    lo = float(df_sample[col].min())
+    hi = float(df_sample[col].max())
+    inputs[col] = st.sidebar.slider(col, lo, hi, float(df_sample[col].mean()))
 
 if st.sidebar.button("Predict"):
-    row = {c: 0 for c in features}
-    for k, v in inputs.items():
-        row[k] = v
-    row[soil] = 1
-    row[wild] = 1
-
-    X = pd.DataFrame([row])[features]
-    pred = pipeline.predict(X)[0]
-    probs = pipeline.predict_proba(X)[0]
+    X_input = pd.DataFrame([inputs])[features]
+    probs = pipeline.predict_proba(X_input)[0]
+    pred = probs.argmax()
 
     st.success(f"🌿 Predicted Forest Cover Type: **{class_map[pred]}**")
-
-    prob_df = pd.DataFrame({
-        "Cover Type": [class_map[i] for i in range(len(probs))],
-        "Probability": probs
-    })
-
-    st.bar_chart(prob_df.set_index("Cover Type"))
-
-
+    st.subheader("Prediction Probabilities")
+    st.bar_chart(pd.Series(probs, index=[class_map[i] for i in range(len(probs))]))
