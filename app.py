@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import joblib
-import requests
 from huggingface_hub import hf_hub_download
 
 @st.cache_resource
@@ -23,13 +22,13 @@ def load_assets():
 
     features = df.drop(columns=["Cover_Type"]).columns.tolist()
     class_map = {
-        1: "Spruce/Fir",
-        2: "Lodgepole Pine",
-        3: "Ponderosa Pine",
-        4: "Cottonwood/Willow",
-        5: "Aspen",
-        6: "Douglas-fir",
-        7: "Krummholz"
+        0: "Aspen",
+        1: "Cottonwood/Willow",
+        2: "Douglas-fir",
+        3: "Krummholz",
+        4: "Lodgepole Pine",
+        5: "Ponderosa Pine",
+        6: "Spruce/Fir"
     }
 
     return pipeline, features, class_map, df
@@ -58,10 +57,7 @@ if st.sidebar.button("Predict"):
 
     st.subheader("Prediction Probabilities")
     prob_df = pd.DataFrame({
-        "Class": [class_map[i+1] for i in range(len(proba))],
+        "Class": [class_map[i] for i in range(len(proba))],
         "Probability": proba
     })
     st.bar_chart(prob_df.set_index("Class"))
-
-st.subheader("Sample Dataset Preview")
-st.dataframe(df.head())
