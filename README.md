@@ -1,133 +1,153 @@
-🌲 EcoType — Forest Cover Type Classification
+# 🌲 EcoType: Forest Cover Type Classification
 
-A Machine Learning web application that predicts forest cover types using cartographic and environmental features such as elevation, soil type, and wilderness area.
+![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
+![Streamlit](https://img.shields.io/badge/Streamlit-App-red.svg)
+![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-ML-orange.svg)
+![Deployment](https://img.shields.io/badge/Deployment-Streamlit%20Cloud-brightgreen.svg)
 
-📌 Project Overview
+🚀 **Live App:** *(Add your Streamlit Cloud link here)*  
+📦 **Model on Hugging Face:** https://huggingface.co/mp28/ecotype-forest-cover-classifier  
+📊 **Dataset on Hugging Face:** https://huggingface.co/datasets/mp28/ecotype-forest-cover-dataset  
 
-EcoType is a classification system built using Random Forest to predict forest cover types across landscapes. The model is trained on geospatial data and deployed using Streamlit to provide real-time predictions through an interactive web interface.
+---
 
-🧠 Cover Types (Corrected)
-Label	Forest Type
-0	Aspen
-1	Douglas-fir
-2	Krummholz
-3	Lodgepole Pine
-4	Ponderosa Pine
-5	Spruce/Fir
-6	Cottonwood/Willow
-🚀 Live Demo
+## 📌 Project Overview
 
-👉 Streamlit App: (Add your deployed link here once published)
-https://your-app-name.streamlit.app
+EcoType is a machine learning application that predicts **forest cover types** using cartographic and environmental features such as elevation, slope, soil type, and wilderness area indicators. The project includes full preprocessing, model training, evaluation, and a deployed **Streamlit web application** for real-time predictions.
 
-🖥️ Application Preview
-🔹 Input Panel
+This project is inspired by the **UCI Forest CoverType dataset** and is ideal for demonstrating real-world classification pipelines and ML deployment skills.
 
-(Add screenshot here after deployment)
+---
 
+## 🎯 Forest Cover Classes
 
-🔹 Prediction Output
+| Class ID | Cover Type |
+|----------|------------|
+| 0 | Aspen |
+| 1 | Lodgepole Pine |
+| 2 | Ponderosa Pine |
+| 3 | Cottonwood/Willow |
+| 4 | Douglas-fir |
+| 5 | Krummholz |
+| 6 | Spruce/Fir |
 
-(Add screenshot here after deployment)
+---
 
+## 🧠 Skills Demonstrated
 
-🛠️ Tech Stack
+- Exploratory Data Analysis (EDA)
+- Feature Engineering
+- Data Preprocessing Pipelines
+- Random Forest Classification
+- Model Evaluation & Validation
+- Model Serialization & Reuse
+- Streamlit App Development
+- Cloud Deployment
+- Hugging Face Model Hosting
 
-Python 🐍
+---
 
-Pandas, NumPy
-
-Scikit-learn
-
-Streamlit
-
-Joblib
-
-📂 Project Structure
+## 🗂️ Project Structure
 EcoType-Forest-Cover-Classification/
-│── app.py
-│── README.md
-│── requirements.txt
-│── final_preprocessed_data.csv
-│── models/
-│   ├── final_pipeline.pkl
-│   ├── model_features.pkl
-│   ├── class_map.pkl
-│── notebooks/
-│   ├── data_cleaning.ipynb
-│   ├── EDA.ipynb
-│   ├── modelling.ipynb
+│
+├── app.py
+├── requirements.txt
+├── README.md
+├── final_preprocessed_data.csv
 
-⚙️ How to Run Locally
-1️⃣ Clone the Repository
+│ ├── data_cleaning.ipynb
+│ ├── EDA.ipynb
+│ ├── modelling.ipynb
+│ └── preprocessing.ipynb
+├── models/
+│ ├── final_pipeline.pkl
+│ ├── class_map.pkl
+│ ├── model_features.pkl
+│ └── scaler.pkl
+└── data/
+└── raw_data.csv
+
+
+---
+
+## ⚙️ Machine Learning Workflow
+
+1. **Data Cleaning**
+   - Removed duplicates
+   - Handled missing values
+
+2. **Feature Engineering**
+   - Created hydrology ratio
+   - Encoded wilderness and soil types
+
+3. **Model Training**
+   - Random Forest Classifier
+   - Hyperparameter tuning with cross-validation
+
+4. **Evaluation**
+   - Achieved ~99% accuracy
+   - Balanced precision/recall across all classes
+
+5. **Deployment**
+   - Saved trained pipeline
+   - Integrated into Streamlit UI
+
+---
+
+## 🖥️ Streamlit Application Features
+
+- Slider-based numeric inputs
+- Dropdown-based soil & wilderness selection
+- Real-time predictions
+- Class probability visualization
+- Clean UI for users
+
+---
+
+
+## 🚀 How to Run Locally
+
+### 1️⃣ Clone Repository
+```bash
 git clone https://github.com/P4pal2004/EcoType-Forest-Cover-Classification.git
 cd EcoType-Forest-Cover-Classification
 
-2️⃣ Install Dependencies
+2️⃣ Create Virtual Environment
+python -m venv venv
+venv\Scripts\activate   # Windows
+
+3️⃣ Install Dependencies
 pip install -r requirements.txt
 
-3️⃣ Run the App
+4️⃣ Download Model Files
+
+Download from Hugging Face:
+
+🔗 https://huggingface.co/mp28/ecotype-forest-cover-classifier
+
+Place files inside:
+
+models/
+
+5️⃣ Run Streamlit App
 streamlit run app.py
 
-📈 Model Performance
+☁️ Deployment
 
-Algorithm: Random Forest Classifier
+This project is deployed using Streamlit Cloud and uses models hosted on Hugging Face Hub for large-file support.
 
-Accuracy: ~99%
+📦 Dataset Source
 
-Evaluation Metrics: Precision, Recall, F1-score
+Dataset hosted on Hugging Face:
+🔗 https://huggingface.co/datasets/mp28/ecotype-forest-cover-dataset
 
-🌍 Features Used
+Original dataset inspired by:
 
-Elevation
+UCI Machine Learning Repository — Forest CoverType Dataset
 
-Aspect
-
-Slope
-
-Horizontal/Vertical Distance to Hydrology
-
-Distance to Roadways
-
-Distance to Fire Points
-
-Hillshade (9am, Noon, 3pm)
-
-Wilderness Area (One-hot encoded)
-
-Soil Type (One-hot encoded)
-
-🧪 Example Prediction
-
-Input:
-
-Elevation: 2500
-Slope: 15
-Wilderness Area: 3
-Soil Type: 15
-
-
-Output:
-
-🌿 Predicted Forest Cover Type: Aspen
-
-📦 Deployment (Streamlit Cloud)
-
-Push your project to GitHub
-
-Go to https://streamlit.io/cloud
-
-Connect your repo
-
-Set app.py as entry file
-
-Deploy 🚀
-
-📜 License
-
-This project is for educational and academic use.
-
-👨‍💻 Author
+🧑‍💻 Author
 
 Mahendra Pal
-GitHub: P4pal2004
+📧 GitHub: https://github.com/P4pal2004
+
+💼 Aspiring Data Scientist | Machine Learning Engineer
