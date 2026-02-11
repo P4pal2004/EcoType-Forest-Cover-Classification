@@ -4,7 +4,7 @@ import joblib
 import os
 import requests
 
-MODEL_URL = "https://huggingface.co/mp28/ecotype-forest-cover-classifier/resolve/main/final_pipeline.pkl"
+MODEL_URL = "https://huggingface.co/mp28/ecotype-forest-cover-classifier/resolve/main/final_pipeline_v2.pkl"
 DATA_URL = "https://huggingface.co/datasets/mp28/ecotype-forest-cover-dataset/resolve/main/final_preprocessed_data.csv"
 
 os.makedirs("models", exist_ok=True)
@@ -18,10 +18,10 @@ def download(url, path):
 
 @st.cache_resource
 def load_assets():
-    download(MODEL_URL, "models/final_pipeline.pkl")
+    download(MODEL_URL, "models/final_pipeline_v2.pkl")
     download(DATA_URL, "models/final_preprocessed_data.csv")
 
-    pipeline = joblib.load("models/final_pipeline.pkl")
+    pipeline = joblib.load("models/final_pipeline_v2.pkl")
     df = pd.read_csv("models/final_preprocessed_data.csv")
 
     features = df.drop(columns=["Cover_Type"]).columns.tolist()
