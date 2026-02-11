@@ -1,24 +1,28 @@
 import streamlit as st
 import pandas as pd
 import joblib
-from huggingface_hub import hf_hub_download
+import os
+import requests
+
+MODEL_URL = "https://huggingface.co/mp28/ecotype-forest-cover-classifier/resolve/main/final_pipeline.pkl"
+DATA_URL = "https://huggingface.co/datasets/mp28/ecotype-forest-cover-dataset/resolve/main/final_preprocessed_data.csv"
+
+os.makedirs("models", exist_ok=True)
+
+def download(url, path):
+    if not os.path.exists(path):
+        r = requests.get(url)
+        r.raise_for_status()
+        with open(path, "wb") as f:
+            f.write(r.content)
 
 @st.cache_resource
 def load_assets():
-    model_path = hf_hub_download(
-        repo_id="mp28/ecotype-forest-cover-classifier",
-        filename="final_pipeline.pkl",
-        repo_type="model"
-    )
+    download(MODEL_URL, "models/final_pipeline.pkl")
+    download(DATA_URL, "models/final_preprocessed_data.csv")
 
-    data_path = hf_hub_download(
-        repo_id="mp28/ecotype-forest-cover-dataset",
-        filename="final_preprocessed_data.csv",
-        repo_type="dataset"
-    )
-
-    pipeline = joblib.load(model_path)
-    df = pd.read_csv(data_path)
+    pipeline = joblib.load("models/final_pipeline.pkl")
+    df = pd.read_csv("models/final_preprocessed_data.csv")
 
     features = df.drop(columns=["Cover_Type"]).columns.tolist()
     class_map = {
@@ -38,26 +42,14 @@ pipeline, features, class_map, df = load_assets()
 
 st.title("🌲 Forest Cover Type Prediction")
 
-st.sidebar.header("Input Features")
-
 inputs = {}
 for col in features:
-    min_val = float(df[col].min())
-    max_val = float(df[col].max())
-    mean_val = float(df[col].mean())
-    inputs[col] = st.sidebar.slider(col, min_val, max_val, mean_val)
-
-X = pd.DataFrame([inputs])[features]
+    inputs[col] = st.sidebar.slider(col, float(df[col].min()), float(df[col].max()), float(df[col].mean()))
 
 if st.sidebar.button("Predict"):
-    pred = pipeline.predict(X)[0]
-    proba = pipeline.predict_proba(X)[0]
+    X = pd.DataFrame([inputs])[features]
+    probs = pipeline.predict_proba(X)[0]
+    pred = probs.argmax()
 
     st.success(f"🌿 Predicted Cover Type: **{class_map[pred]}**")
-
-    st.subheader("Prediction Probabilities")
-    prob_df = pd.DataFrame({
-        "Class": [class_map[i] for i in range(len(proba))],
-        "Probability": proba
-    })
-    st.bar_chart(prob_df.set_index("Class"))
+    st.bar_chart(pd.Series(probs, index=[class_map[i] for i in range(len(probs))]))
