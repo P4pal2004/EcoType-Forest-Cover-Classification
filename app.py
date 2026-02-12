@@ -7,22 +7,27 @@ import requests
 MODEL_URL = "https://huggingface.co/mp28/ecotype-forest-cover-classifier/resolve/main/final_pipeline_v2.pkl"
 DATA_URL = "https://huggingface.co/datasets/mp28/ecotype-forest-cover-dataset/resolve/main/final_preprocessed_data.csv"
 
+MODEL_PATH = "models/final_pipeline_v2.pkl"
+DATA_PATH = "models/final_preprocessed_data.csv"
+
 os.makedirs("models", exist_ok=True)
+
 
 def download(url, path):
     if not os.path.exists(path):
-        r = requests.get(url)
+        r = requests.get(url, timeout=60)
         r.raise_for_status()
         with open(path, "wb") as f:
             f.write(r.content)
 
+
 @st.cache_resource
 def load_assets():
-    download(MODEL_URL, "models/final_pipeline_v2.pkl")
-    download(DATA_URL, "models/final_preprocessed_data.csv")
+    download(MODEL_URL, MODEL_PATH)
+    download(DATA_URL, DATA_PATH)
 
-    pipeline = joblib.load("models/final_pipeline_v2.pkl")
-    df = pd.read_csv("models/final_preprocessed_data.csv")
+    pipeline = joblib.load(MODEL_PATH)
+    df = pd.read_csv(DATA_PATH)
 
     features = df.drop(columns=["Cover_Type"]).columns.tolist()
     class_map = {
@@ -44,7 +49,12 @@ st.title("🌲 Forest Cover Type Prediction")
 
 inputs = {}
 for col in features:
-    inputs[col] = st.sidebar.slider(col, float(df[col].min()), float(df[col].max()), float(df[col].mean()))
+    inputs[col] = st.sidebar.slider(
+        col,
+        float(df[col].min()),
+        float(df[col].max()),
+        float(df[col].mean())
+    )
 
 if st.sidebar.button("Predict"):
     X = pd.DataFrame([inputs])[features]
