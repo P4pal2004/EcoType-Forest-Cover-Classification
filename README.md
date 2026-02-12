@@ -5,7 +5,9 @@
 ![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-ML-orange.svg)
 ![Deployment](https://img.shields.io/badge/Deployment-Streamlit%20Cloud-brightgreen.svg)
 
-🚀 **Live App:** *(Add your Streamlit Cloud link here)*  
+🚀 **Live App:** *(
+🔗 https://ecotype-forest-cover-classification-mrqengbfnxtcujlook84l2.streamlit.app/
+)*  
 📦 **Model on Hugging Face:** https://huggingface.co/mp28/ecotype-forest-cover-classifier  
 📊 **Dataset on Hugging Face:** https://huggingface.co/datasets/mp28/ecotype-forest-cover-dataset  
 
